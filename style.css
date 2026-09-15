@@ -1,312 +1,304 @@
-:root {
-  --paper: #efe7d8;
-  --paper-alt: #e7ddc9;
-  --margin-red: #a83a2c;
-  --ink: #26241f;
-  --ink-soft: #55503f;
-  --rule: #c9bfa4;
-  --brass: #8a6a1f;
-  --brass-soft: #b9975a;
-  --error: #a83a2c;
-  --focus: #1f5c4e;
-}
+```css
+/* ------------------------------
+   General
+------------------------------ */
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 body {
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: 'Source Serif 4', Georgia, serif;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f6f8;
+    color: #1f2937;
+    padding: 40px 20px;
 }
 
-::selection { background: var(--brass-soft); color: var(--paper); }
-
-a { color: var(--focus); }
-
-:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 3px;
+.container {
+    max-width: 900px;
+    margin: auto;
 }
 
-.sheet {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 0 28px 80px;
-  position: relative;
-}
 
-/* Ledger margin rule running down the page */
-.sheet::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 56px;
-  width: 1.5px;
-  background: var(--margin-red);
-  opacity: 0.45;
-}
+/* ------------------------------
+   Header
+------------------------------ */
 
-header.masthead {
-  padding: 56px 0 28px 40px;
-  position: relative;
-}
-
-.book-label {
-  font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 12.5px;
-  letter-spacing: 0.04em;
-  color: var(--ink-soft);
-  margin: 0 0 14px;
-}
-
-h1.title {
-  font-family: 'Special Elite', 'Courier New', monospace;
-  font-weight: 400;
-  font-size: clamp(30px, 6vw, 44px);
-  margin: 0 0 10px;
-  color: var(--ink);
-  letter-spacing: 0.01em;
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
 }
 
 .subtitle {
-  font-size: 17px;
-  color: var(--ink-soft);
-  max-width: 46ch;
-  margin: 0;
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 5px;
 }
 
-.divider {
-  height: 1px;
-  background: repeating-linear-gradient(
-    to right,
-    var(--rule) 0,
-    var(--rule) 6px,
-    transparent 6px,
-    transparent 12px
-  );
-  margin: 28px 0 0 40px;
+h1 {
+    font-size: 32px;
 }
 
-/* Registration form styled as a ledger entry */
-section.entry-form {
-  padding: 40px 0 8px 40px;
+h2 {
+    font-size: 20px;
+    margin-bottom: 18px;
 }
 
-.form-heading {
-  font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 14px;
-  color: var(--brass);
-  margin: 0 0 22px;
+.record-count {
+    text-align: right;
+    color: #6b7280;
 }
 
-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px 28px;
+.record-count strong {
+    display: block;
+    font-size: 28px;
+    color: #111827;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+
+/* ------------------------------
+   Cards
+------------------------------ */
+
+.card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 20px;
 }
 
-.field.full { grid-column: 1 / -1; }
 
-.field label {
-  font-size: 13.5px;
-  color: var(--ink-soft);
+/* ------------------------------
+   Form
+------------------------------ */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
 }
 
-.field .req { color: var(--margin-red); }
-
-.field input {
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 17px;
-  color: var(--ink);
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--rule);
-  padding: 6px 2px 8px;
-  transition: border-color 0.15s ease;
+.form-group {
+    display: flex;
+    flex-direction: column;
 }
 
-.field input:hover { border-bottom-color: var(--ink-soft); }
-
-.field input:focus {
-  border-bottom-color: var(--focus);
+label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
 }
 
-.field input::placeholder { color: #a89f88; }
-
-.form-actions {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 6px;
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
 }
 
-button.submit {
-  font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 14px;
-  color: var(--paper);
-  background: var(--ink);
-  border: none;
-  padding: 13px 26px;
-  cursor: pointer;
-  letter-spacing: 0.01em;
-  transition: background 0.15s ease, transform 0.1s ease;
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 }
 
-button.submit:hover { background: var(--margin-red); }
-button.submit:active { transform: translateY(1px); }
-button.submit:disabled { background: #a89f88; cursor: default; }
 
-.form-note {
-  font-size: 13.5px;
-  color: var(--ink-soft);
-  min-height: 18px;
+/* ------------------------------
+   Buttons
+------------------------------ */
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
 }
 
-.form-note.error { color: var(--error); }
-
-/* Roster / ledger table */
-section.roster {
-  padding: 52px 0 0 40px;
+.btn {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-.roster-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
+.primary {
+    background: #4f46e5;
+    color: white;
 }
 
-.roster-title {
-  font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 14px;
-  color: var(--brass);
-  margin: 0;
+.primary:hover {
+    background: #4338ca;
 }
 
-.roster-count {
-  font-size: 13.5px;
-  color: var(--ink-soft);
+.secondary {
+    background: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
 }
 
-.search-field {
-  margin-bottom: 22px;
+.secondary:hover {
+    background: #f3f4f6;
 }
 
-.search-field input {
-  width: 100%;
-  max-width: 320px;
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 15px;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--rule);
-  padding: 7px 2px;
-  color: var(--ink);
+.delete {
+    color: #dc2626;
 }
 
-.search-field input:focus { border-bottom-color: var(--focus); }
-.search-field input::placeholder { color: #a89f88; }
-
-table.roll {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 15.5px;
+.delete:hover {
+    background: #fef2f2;
 }
 
-table.roll thead th {
-  text-align: left;
-  font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 11.5px;
-  font-weight: 400;
-  color: var(--ink-soft);
-  padding: 0 12px 10px 0;
-  border-bottom: 1px solid var(--ink-soft);
+
+/* ------------------------------
+   Messages
+------------------------------ */
+
+#formMessage {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #4f46e5;
 }
 
-table.roll th.num, table.roll td.num {
-  width: 44px;
-  color: var(--brass);
+
+/* ------------------------------
+   Search
+------------------------------ */
+
+.search-row {
+    display: flex;
+    gap: 12px;
 }
 
-table.roll tbody tr {
-  border-bottom: 1px solid var(--rule);
+.search-row input {
+    flex: 1;
 }
 
-table.roll tbody tr:hover { background: var(--paper-alt); }
-
-table.roll td {
-  padding: 13px 12px 13px 0;
-  vertical-align: top;
-  color: var(--ink);
+.search-row select {
+    width: 190px;
 }
 
-table.roll td.meta {
-  color: var(--ink-soft);
-  font-size: 14px;
+
+/* ------------------------------
+   Records
+------------------------------ */
+
+.record {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 16px 0;
+
+    border-top: 1px solid #e5e7eb;
 }
 
-td.remove-cell { text-align: right; }
-
-.remove-btn {
-  font-family: 'Special Elite', 'Courier New', monospace;
-  font-size: 11.5px;
-  background: none;
-  border: none;
-  color: var(--ink-soft);
-  cursor: pointer;
-  padding: 4px 2px;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+.record:first-child {
+    border-top: none;
 }
 
-.remove-btn:hover { color: var(--margin-red); }
-
-.empty-state {
-  padding: 28px 0 40px;
-  color: var(--ink-soft);
-  font-size: 15.5px;
-  font-style: italic;
+.record-info {
+    min-width: 0;
 }
 
-.loading-state {
-  padding: 28px 0;
-  color: var(--ink-soft);
-  font-size: 14.5px;
-  font-family: 'Special Elite', 'Courier New', monospace;
+.record-name {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 5px;
 }
 
-footer.colophon {
-  padding: 60px 0 0 40px;
-  font-size: 13px;
-  color: var(--ink-soft);
+.record-details {
+    color: #6b7280;
+    font-size: 14px;
 }
 
-@media (max-width: 620px) {
-  .sheet::before { left: 20px; }
-  header.masthead, section.entry-form, section.roster, footer.colophon,
-  .divider {
-    padding-left: 14px;
-    margin-left: 14px;
-  }
-  header.masthead, section.entry-form, section.roster, footer.colophon { margin-left: 0; }
-  form { grid-template-columns: 1fr; }
-  table.roll { font-size: 14px; }
-  table.roll th.meta-col, table.roll td.meta { display: none; }
+.badge {
+    display: inline-block;
+
+    margin-left: 6px;
+
+    padding: 4px 8px;
+
+    border-radius: 20px;
+
+    background: #eef2ff;
+    color: #4338ca;
+
+    font-size: 12px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; }
+.record-actions {
+    display: flex;
+    gap: 8px;
 }
+
+.record-actions button {
+    padding: 8px 12px;
+}
+
+
+/* ------------------------------
+   Empty state
+------------------------------ */
+
+.empty {
+    text-align: center;
+    padding: 35px 10px;
+    color: #6b7280;
+}
+
+
+/* ------------------------------
+   Mobile
+------------------------------ */
+
+@media (max-width: 650px) {
+
+    body {
+        padding: 20px 12px;
+    }
+
+    header {
+        align-items: flex-start;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .search-row {
+        flex-direction: column;
+    }
+
+    .search-row select {
+        width: 100%;
+    }
+
+    .record {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .record-actions {
+        width: 100%;
+    }
+
+    .record-actions button {
+        flex: 1;
+    }
+}
+```
