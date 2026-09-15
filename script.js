@@ -1,81 +1,55 @@
-```javascript
-/* =====================================
-   Registry System
-===================================== */
+// =====================================
+// Registry System
+// =====================================
+
+// Load saved records from the browser.
+// If there are no saved records, start with an empty array.
+let records = JSON.parse(
+    localStorage.getItem("registryRecords")
+) || [];
 
 
-/* ------------------------------
-   Initial Data
------------------------------- */
-
-let records = [
-    {
-        id: "1",
-        name: "Aarav Sharma",
-        registryId: "REG-001",
-        email: "aarav@example.com",
-        phone: "9876543210",
-        category: "Student"
-    },
-
-    {
-        id: "2",
-        name: "Priya Patil",
-        registryId: "REG-002",
-        email: "priya@example.com",
-        phone: "9123456780",
-        category: "Faculty"
-    }
-];
-
-
-/* ------------------------------
-   DOM Elements
------------------------------- */
+// =====================================
+// DOM Elements
+// =====================================
 
 const recordForm = document.getElementById("recordForm");
-
 const editId = document.getElementById("editId");
 
 const nameInput = document.getElementById("name");
+const registryIdInput = document.getElementById("registryId");
+const emailInput = document.getElementById("email");
+const phoneInput = document.getElementById("phone");
+const categoryInput = document.getElementById("category");
 
-const registryIdInput =
-    document.getElementById("registryId");
+const submitButton = document.getElementById("submitButton");
+const cancelButton = document.getElementById("cancelButton");
 
-const emailInput =
-    document.getElementById("email");
+const formMessage = document.getElementById("formMessage");
 
-const phoneInput =
-    document.getElementById("phone");
+const searchInput = document.getElementById("searchInput");
+const filterCategory = document.getElementById("filterCategory");
 
-const categoryInput =
-    document.getElementById("category");
-
-const submitButton =
-    document.getElementById("submitButton");
-
-const cancelButton =
-    document.getElementById("cancelButton");
-
-const formMessage =
-    document.getElementById("formMessage");
-
-const searchInput =
-    document.getElementById("searchInput");
-
-const filterCategory =
-    document.getElementById("filterCategory");
-
-const recordsList =
-    document.getElementById("recordsList");
-
-const recordCount =
-    document.getElementById("recordCount");
+const recordsList = document.getElementById("recordsList");
+const recordCount = document.getElementById("recordCount");
 
 
-/* ------------------------------
-   Render Records
------------------------------- */
+// =====================================
+// Save Records
+// =====================================
+
+function saveRecords() {
+
+    localStorage.setItem(
+        "registryRecords",
+        JSON.stringify(records)
+    );
+}
+
+
+// =====================================
+// Display Records
+// =====================================
 
 function renderRecords() {
 
@@ -92,6 +66,7 @@ function renderRecords() {
         records.filter(record => {
 
             const matchesSearch =
+
                 record.name
                     .toLowerCase()
                     .includes(searchText)
@@ -122,6 +97,7 @@ function renderRecords() {
 
 
             const matchesCategory =
+
                 selectedCategory === "All"
 
                 ||
@@ -137,19 +113,17 @@ function renderRecords() {
         });
 
 
-    /* Update count */
-
+    // Update total record count
     recordCount.textContent =
         records.length;
 
 
-    /* Empty state */
-
+    // No records
     if (filteredRecords.length === 0) {
 
         recordsList.innerHTML = `
             <div class="empty">
-                No matching records found.
+                No records found.
             </div>
         `;
 
@@ -157,12 +131,12 @@ function renderRecords() {
     }
 
 
-    /* Generate records */
-
+    // Display records
     recordsList.innerHTML =
         filteredRecords.map(record => {
 
             return `
+
                 <div class="record">
 
                     <div class="record-info">
@@ -176,6 +150,7 @@ function renderRecords() {
                             </span>
 
                         </div>
+
 
                         <div class="record-details">
 
@@ -211,6 +186,7 @@ function renderRecords() {
                             Edit
                         </button>
 
+
                         <button
                             class="btn secondary delete"
                             data-action="delete"
@@ -222,15 +198,16 @@ function renderRecords() {
                     </div>
 
                 </div>
+
             `;
 
         }).join("");
 }
 
 
-/* ------------------------------
-   Add / Update Record
------------------------------- */
+// =====================================
+// Add / Update Record
+// =====================================
 
 recordForm.addEventListener(
     "submit",
@@ -255,8 +232,7 @@ recordForm.addEventListener(
             categoryInput.value;
 
 
-        /* Required fields */
-
+        // Check required fields
         if (!name || !registryId) {
 
             showMessage(
@@ -267,19 +243,21 @@ recordForm.addEventListener(
         }
 
 
-        /* Check duplicate ID */
-
+        // Check duplicate Registry ID
         const duplicate =
             records.some(record => {
 
                 return (
+
                     record.registryId
                         .toLowerCase() ===
                     registryId.toLowerCase()
 
                     &&
 
-                    record.id !== editId.value
+                    record.id !==
+                        editId.value
+
                 );
 
             });
@@ -295,7 +273,9 @@ recordForm.addEventListener(
         }
 
 
-        /* Editing */
+        // =================================
+        // Update existing record
+        // =================================
 
         if (editId.value) {
 
@@ -331,7 +311,9 @@ recordForm.addEventListener(
         }
 
 
-        /* Adding */
+        // =================================
+        // Add new record
+        // =================================
 
         else {
 
@@ -366,16 +348,23 @@ recordForm.addEventListener(
         }
 
 
+        // Save to browser
+        saveRecords();
+
+
+        // Refresh display
         renderRecords();
 
+
+        // Clear form
         resetForm();
     }
 );
 
 
-/* ------------------------------
-   Edit / Delete
------------------------------- */
+// =====================================
+// Edit / Delete Buttons
+// =====================================
 
 recordsList.addEventListener(
     "click",
@@ -397,15 +386,11 @@ recordsList.addEventListener(
             button.dataset.id;
 
 
-        /* Edit */
-
         if (action === "edit") {
 
             editRecord(id);
         }
 
-
-        /* Delete */
 
         if (action === "delete") {
 
@@ -415,9 +400,9 @@ recordsList.addEventListener(
 );
 
 
-/* ------------------------------
-   Edit Record
------------------------------- */
+// =====================================
+// Edit Record
+// =====================================
 
 function editRecord(id) {
 
@@ -462,9 +447,9 @@ function editRecord(id) {
 }
 
 
-/* ------------------------------
-   Delete Record
------------------------------- */
+// =====================================
+// Delete Record
+// =====================================
 
 function deleteRecord(id) {
 
@@ -496,7 +481,13 @@ function deleteRecord(id) {
         );
 
 
+    // Save updated records
+    saveRecords();
+
+
+    // Refresh page data
     renderRecords();
+
 
     showMessage(
         "Record deleted."
@@ -504,9 +495,9 @@ function deleteRecord(id) {
 }
 
 
-/* ------------------------------
-   Cancel Editing
------------------------------- */
+// =====================================
+// Cancel Editing
+// =====================================
 
 cancelButton.addEventListener(
     "click",
@@ -517,9 +508,9 @@ cancelButton.addEventListener(
 );
 
 
-/* ------------------------------
-   Reset Form
------------------------------- */
+// =====================================
+// Reset Form
+// =====================================
 
 function resetForm() {
 
@@ -535,9 +526,9 @@ function resetForm() {
 }
 
 
-/* ------------------------------
-   Search
------------------------------- */
+// =====================================
+// Search
+// =====================================
 
 searchInput.addEventListener(
     "input",
@@ -548,9 +539,9 @@ searchInput.addEventListener(
 );
 
 
-/* ------------------------------
-   Category Filter
------------------------------- */
+// =====================================
+// Category Filter
+// =====================================
 
 filterCategory.addEventListener(
     "change",
@@ -561,9 +552,9 @@ filterCategory.addEventListener(
 );
 
 
-/* ------------------------------
-   Messages
------------------------------- */
+// =====================================
+// Message
+// =====================================
 
 function showMessage(message) {
 
@@ -583,14 +574,9 @@ function showMessage(message) {
 }
 
 
-/* ------------------------------
-   Security
------------------------------- */
-
-/*
-   Prevent user-entered HTML
-   from being interpreted as HTML.
-*/
+// =====================================
+// Security
+// =====================================
 
 function escapeHTML(value) {
 
@@ -603,9 +589,8 @@ function escapeHTML(value) {
 }
 
 
-/* ------------------------------
-   Initial Render
------------------------------- */
+// =====================================
+// Start Application
+// =====================================
 
 renderRecords();
-```
