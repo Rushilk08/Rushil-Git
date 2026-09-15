@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Registry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Student Registry</h1>
+      <p class="header-sub">Add each student's name, USN, and email. The roster updates as you go.</p>
+    </div>
+    <div class="count-block">
+      <div class="count-num" id="countNum">0</div>
+      <div class="count-label">students registered</div>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- Registration form -->
+    <div class="card">
+      <h2>Register a student</h2>
+      <form id="regForm" novalidate>
+        <div class="field">
+          <label for="nameInput">Full name</label>
+          <input id="nameInput" type="text" placeholder="e.g. Ananya Rao" autocomplete="off">
+          <div class="field-error" id="nameError"></div>
+        </div>
+        <div class="field">
+          <label for="usnInput">USN</label>
+          <input id="usnInput" type="text" placeholder="e.g. 1RV23CS045" autocomplete="off">
+          <div class="field-error" id="usnError"></div>
+        </div>
+        <div class="field">
+          <label for="emailInput">Email</label>
+          <input id="emailInput" type="email" placeholder="e.g. ananya.rao@college.edu" autocomplete="off">
+          <div class="field-error" id="emailError"></div>
+        </div>
+        <button type="submit">Add student</button>
+        <div class="form-status" id="formStatus"></div>
+      </form>
+    </div>
+
+    <!-- Roster -->
+    <div class="card">
+      <div class="roster-head">
+        <div class="search-box">
+          <input id="searchInput" type="text" placeholder="Search by name, USN, or email...">
+        </div>
+        <button class="export-btn" onclick="exportCSV()">Download CSV</button>
+      </div>
+
+      <div id="tableContainer">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Data stays in this browser tab only, and clears on refresh — download the CSV to keep a copy.
+  </footer>
+</div>
+
+<script>
+  let students = [];
+  let idCounter = 1;
+
+  const form = document.getElementById('regForm');
+  const nameInput = document.getElementById('nameInput');
+  const usnInput = document.getElementById('usnInput');
+  const emailInput = document.getElementById('emailInput');
+  const searchInput = document.getElementById('searchInput');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    clearErrors();
+
+    const name = nameInput.value.trim();
+    const usn = usnInput.value.trim().toUpperCase();
+    const email = emailInput.value.trim();
+
+    let hasError = false;
+
+    if(!name){
+      document.getElementById('nameError').textContent = 'Enter a name.';
+      hasError = true;
+    }
+
+    if(!usn){
+      document.getElementById('usnError').textContent = 'Enter a USN.';
+      hasError = true;
+    } else if(students.some(s => s.usn === usn)){
+      document.getElementById('usnError').textContent = 'This USN is already registered.';
+      hasError = true;
+    }
+
+    if(!email){
+      document.getElementById('emailError').textContent = 'Enter an email.';
+      hasError = true;
+    } else if(!isValidEmail(email)){
+      document.getElementById('emailError').textContent = 'That email doesn\'t look right.';
+      hasError = true;
+    }
+
+    if(hasError) return;
+
+    students.push({ id: idCounter++, name, usn, email });
+    form.reset();
+    nameInput.focus();
+    showStatus(`Added ${name}.`);
+    render();
+  });
+
+  function isValidEmail(email){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function clearErrors(){
+    document.getElementById('nameError').textContent = '';
+    document.getElementById('usnError').textContent = '';
+    document.getElementById('emailError').textContent = '';
+  }
+
+  function showStatus(msg){
+    const el = document.getElementById('formStatus');
+    el.textContent = msg;
+    setTimeout(() => { if(el.textContent === msg) el.textContent = ''; }, 2500);
+  }
+
+  function removeStudent(id){
+    students = students.filter(s => s.id !== id);
+    render();
+  }
+
+  function render(){
+    const container = document.getElementById('tableContainer');
+    const query = searchInput.value.trim().toLowerCase();
+
+    const filtered = students.filter(s =>
+      s.name.toLowerCase().includes(query) ||
+      s.usn.toLowerCase().includes(query) ||
+      s.email.toLowerCase().includes(query)
+    );
+
+    document.getElementById('countNum').textContent = students.length;
+
+    if(students.length === 0){
+      container.innerHTML = `
+        <div class="empty-state">
+          <strong>No students yet</strong>
+          <p>Use the form to register the first one.</p>
+        </div>`;
+      return;
+    }
+
+    if(filtered.length === 0){
+      container.innerHTML = `
+        <div class="empty-state">
+          <strong>No matches</strong>
+          <p>Try a different search term.</p>
+        </div>`;
+      return;
+    }
+
+    let rows = filtered.map(s => `
+      <tr>
+        <td class="student-name">${escapeHTML(s.name)}</td>
+        <td class="student-usn">${escapeHTML(s.usn)}</td>
+        <td class="student-email">${escapeHTML(s.email)}</td>
+        <td><button class="row-delete" onclick="removeStudent(${s.id})">Remove</button></td>
+      </tr>`).join('');
+
+    container.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>USN</th>
+            <th>Email</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  function escapeHTML(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function exportCSV(){
+    if(students.length === 0){
+      showStatus('Nothing to export yet.');
+      return;
+    }
+    let csv = 'Name,USN,Email\n';
+    students.forEach(s => {
+      csv += `"${s.name.replace(/"/g,'""')}","${s.usn.replace(/"/g,'""')}","${s.email.replace(/"/g,'""')}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'student-registry.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  searchInput.addEventListener('input', render);
+
+  render();
+</script>
+
+</body>
+</html>
