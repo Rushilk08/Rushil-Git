@@ -1,145 +1,611 @@
-(function () {
-  const STORAGE_KEY = 'registry:students';
-  let students = [];
+```javascript
+/* =====================================
+   Registry System
+===================================== */
 
-  const form = document.getElementById('registry-form');
-  const submitBtn = document.getElementById('submit-btn');
-  const formNote = document.getElementById('form-note');
-  const rosterContainer = document.getElementById('roster-container');
-  const rosterCount = document.getElementById('roster-count');
-  const searchInput = document.getElementById('search-input');
 
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
+/* ------------------------------
+   Initial Data
+------------------------------ */
 
-  function setNote(msg, isError) {
-    formNote.textContent = msg || '';
-    formNote.classList.toggle('error', !!isError);
-  }
+let records = [
+    {
+        id: "1",
+        name: "Aarav Sharma",
+        registryId: "REG-001",
+        email: "aarav@example.com",
+        phone: "9876543210",
+        category: "Student"
+    },
 
-  function loadStudents() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      students = raw ? JSON.parse(raw) : [];
-    } catch (err) {
-      students = [];
+    {
+        id: "2",
+        name: "Priya Patil",
+        registryId: "REG-002",
+        email: "priya@example.com",
+        phone: "9123456780",
+        category: "Faculty"
     }
-    render();
-  }
+];
 
-  function saveStudents() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
-  }
 
-  function render() {
-    const query = searchInput.value.trim().toLowerCase();
-    const filtered = query
-      ? students.filter(s =>
-          (s.name || '').toLowerCase().includes(query) ||
-          (s.rollNo || '').toLowerCase().includes(query) ||
-          (s.className || '').toLowerCase().includes(query))
-      : students;
+/* ------------------------------
+   DOM Elements
+------------------------------ */
 
-    rosterCount.textContent = students.length === 1 ? '1 entry' : students.length + ' entries';
+const recordForm = document.getElementById("recordForm");
 
-    if (students.length === 0) {
-      rosterContainer.innerHTML = '<p class="empty-state">No one is on the roll yet. Be the first entry above.</p>';
-      return;
+const editId = document.getElementById("editId");
+
+const nameInput = document.getElementById("name");
+
+const registryIdInput =
+    document.getElementById("registryId");
+
+const emailInput =
+    document.getElementById("email");
+
+const phoneInput =
+    document.getElementById("phone");
+
+const categoryInput =
+    document.getElementById("category");
+
+const submitButton =
+    document.getElementById("submitButton");
+
+const cancelButton =
+    document.getElementById("cancelButton");
+
+const formMessage =
+    document.getElementById("formMessage");
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const filterCategory =
+    document.getElementById("filterCategory");
+
+const recordsList =
+    document.getElementById("recordsList");
+
+const recordCount =
+    document.getElementById("recordCount");
+
+
+/* ------------------------------
+   Render Records
+------------------------------ */
+
+function renderRecords() {
+
+    const searchText =
+        searchInput.value
+            .trim()
+            .toLowerCase();
+
+    const selectedCategory =
+        filterCategory.value;
+
+
+    const filteredRecords =
+        records.filter(record => {
+
+            const matchesSearch =
+                record.name
+                    .toLowerCase()
+                    .includes(searchText)
+
+                ||
+
+                record.registryId
+                    .toLowerCase()
+                    .includes(searchText)
+
+                ||
+
+                record.email
+                    .toLowerCase()
+                    .includes(searchText)
+
+                ||
+
+                record.phone
+                    .toLowerCase()
+                    .includes(searchText)
+
+                ||
+
+                record.category
+                    .toLowerCase()
+                    .includes(searchText);
+
+
+            const matchesCategory =
+                selectedCategory === "All"
+
+                ||
+
+                record.category ===
+                    selectedCategory;
+
+
+            return (
+                matchesSearch &&
+                matchesCategory
+            );
+        });
+
+
+    /* Update count */
+
+    recordCount.textContent =
+        records.length;
+
+
+    /* Empty state */
+
+    if (filteredRecords.length === 0) {
+
+        recordsList.innerHTML = `
+            <div class="empty">
+                No matching records found.
+            </div>
+        `;
+
+        return;
     }
 
-    if (filtered.length === 0) {
-      rosterContainer.innerHTML = '<p class="empty-state">No entries match that search.</p>';
-      return;
+
+    /* Generate records */
+
+    recordsList.innerHTML =
+        filteredRecords.map(record => {
+
+            return `
+                <div class="record">
+
+                    <div class="record-info">
+
+                        <div class="record-name">
+
+                            ${escapeHTML(record.name)}
+
+                            <span class="badge">
+                                ${escapeHTML(record.category)}
+                            </span>
+
+                        </div>
+
+                        <div class="record-details">
+
+                            ID:
+                            ${escapeHTML(record.registryId)}
+
+                            &nbsp; • &nbsp;
+
+                            ${escapeHTML(
+                                record.email ||
+                                "No email"
+                            )}
+
+                            &nbsp; • &nbsp;
+
+                            ${escapeHTML(
+                                record.phone ||
+                                "No phone"
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="record-actions">
+
+                        <button
+                            class="btn secondary"
+                            data-action="edit"
+                            data-id="${record.id}"
+                        >
+                            Edit
+                        </button>
+
+                        <button
+                            class="btn secondary delete"
+                            data-action="delete"
+                            data-id="${record.id}"
+                        >
+                            Delete
+                        </button>
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+}
+
+
+/* ------------------------------
+   Add / Update Record
+------------------------------ */
+
+recordForm.addEventListener(
+    "submit",
+    function(event) {
+
+        event.preventDefault();
+
+
+        const name =
+            nameInput.value.trim();
+
+        const registryId =
+            registryIdInput.value.trim();
+
+        const email =
+            emailInput.value.trim();
+
+        const phone =
+            phoneInput.value.trim();
+
+        const category =
+            categoryInput.value;
+
+
+        /* Required fields */
+
+        if (!name || !registryId) {
+
+            showMessage(
+                "Name and Registry ID are required."
+            );
+
+            return;
+        }
+
+
+        /* Check duplicate ID */
+
+        const duplicate =
+            records.some(record => {
+
+                return (
+                    record.registryId
+                        .toLowerCase() ===
+                    registryId.toLowerCase()
+
+                    &&
+
+                    record.id !== editId.value
+                );
+
+            });
+
+
+        if (duplicate) {
+
+            showMessage(
+                "That Registry ID already exists."
+            );
+
+            return;
+        }
+
+
+        /* Editing */
+
+        if (editId.value) {
+
+            const record =
+                records.find(
+                    r => r.id === editId.value
+                );
+
+
+            if (record) {
+
+                record.name =
+                    name;
+
+                record.registryId =
+                    registryId;
+
+                record.email =
+                    email;
+
+                record.phone =
+                    phone;
+
+                record.category =
+                    category;
+            }
+
+
+            showMessage(
+                "Record updated successfully."
+            );
+
+        }
+
+
+        /* Adding */
+
+        else {
+
+            const newRecord = {
+
+                id:
+                    Date.now().toString(),
+
+                name:
+                    name,
+
+                registryId:
+                    registryId,
+
+                email:
+                    email,
+
+                phone:
+                    phone,
+
+                category:
+                    category
+            };
+
+
+            records.push(newRecord);
+
+
+            showMessage(
+                "Record added successfully."
+            );
+        }
+
+
+        renderRecords();
+
+        resetForm();
+    }
+);
+
+
+/* ------------------------------
+   Edit / Delete
+------------------------------ */
+
+recordsList.addEventListener(
+    "click",
+    function(event) {
+
+        const button =
+            event.target.closest("button");
+
+
+        if (!button) {
+            return;
+        }
+
+
+        const action =
+            button.dataset.action;
+
+        const id =
+            button.dataset.id;
+
+
+        /* Edit */
+
+        if (action === "edit") {
+
+            editRecord(id);
+        }
+
+
+        /* Delete */
+
+        if (action === "delete") {
+
+            deleteRecord(id);
+        }
+    }
+);
+
+
+/* ------------------------------
+   Edit Record
+------------------------------ */
+
+function editRecord(id) {
+
+    const record =
+        records.find(
+            r => r.id === id
+        );
+
+
+    if (!record) {
+        return;
     }
 
-    let rows = '';
-    filtered.forEach((s, idx) => {
-      rows += `<tr data-id="${escapeHtml(s.id)}">
-        <td class="num">${String(idx + 1).padStart(3, '0')}</td>
-        <td>${escapeHtml(s.name)}</td>
-        <td class="meta">${escapeHtml(s.rollNo)}</td>
-        <td class="meta">${escapeHtml(s.className || '\u2014')}</td>
-        <td class="meta">${escapeHtml(s.email || '\u2014')}</td>
-        <td class="remove-cell"><button class="remove-btn" data-remove="${escapeHtml(s.id)}">Remove</button></td>
-      </tr>`;
-    });
 
-    rosterContainer.innerHTML = `
-      <table class="roll">
-        <thead>
-          <tr>
-            <th class="num">No.</th>
-            <th>Name</th>
-            <th class="meta-col">Roll / ID</th>
-            <th class="meta-col">Class</th>
-            <th class="meta-col">Email</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
+    editId.value =
+        record.id;
 
-    rosterContainer.querySelectorAll('[data-remove]').forEach(btn => {
-      btn.addEventListener('click', () => removeStudent(btn.getAttribute('data-remove')));
-    });
-  }
+    nameInput.value =
+        record.name;
 
-  function removeStudent(id) {
-    students = students.filter(s => s.id !== id);
-    render();
-    try {
-      saveStudents();
-    } catch (err) {
-      setNote('Could not update the record. Try again.', true);
-    }
-  }
+    registryIdInput.value =
+        record.registryId;
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const name = document.getElementById('f-name').value.trim();
-    const rollNo = document.getElementById('f-roll').value.trim();
-    const className = document.getElementById('f-class').value.trim();
-    const email = document.getElementById('f-email').value.trim();
-    const phone = document.getElementById('f-phone').value.trim();
+    emailInput.value =
+        record.email;
 
-    if (!name || !rollNo) {
-      setNote('Name and roll number are required.', true);
-      return;
+    phoneInput.value =
+        record.phone;
+
+    categoryInput.value =
+        record.category;
+
+
+    submitButton.textContent =
+        "Update Record";
+
+    cancelButton.hidden =
+        false;
+
+
+    nameInput.focus();
+}
+
+
+/* ------------------------------
+   Delete Record
+------------------------------ */
+
+function deleteRecord(id) {
+
+    const record =
+        records.find(
+            r => r.id === id
+        );
+
+
+    if (!record) {
+        return;
     }
 
-    const entry = {
-      id: 'stu_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-      name, rollNo, className, email, phone,
-      addedAt: new Date().toISOString()
-    };
 
-    submitBtn.disabled = true;
-    setNote('Saving\u2026', false);
+    const confirmed =
+        confirm(
+            `Delete ${record.name}?`
+        );
 
-    students.push(entry);
-    render();
 
-    try {
-      saveStudents();
-      setNote('Added to the registry.', false);
-      form.reset();
-    } catch (err) {
-      students = students.filter(s => s.id !== entry.id);
-      render();
-      setNote('Could not save \u2014 your browser storage may be full or blocked.', true);
-    } finally {
-      submitBtn.disabled = false;
+    if (!confirmed) {
+        return;
     }
-  });
 
-  searchInput.addEventListener('input', render);
 
-  loadStudents();
-})();
+    records =
+        records.filter(
+            r => r.id !== id
+        );
+
+
+    renderRecords();
+
+    showMessage(
+        "Record deleted."
+    );
+}
+
+
+/* ------------------------------
+   Cancel Editing
+------------------------------ */
+
+cancelButton.addEventListener(
+    "click",
+    function() {
+
+        resetForm();
+    }
+);
+
+
+/* ------------------------------
+   Reset Form
+------------------------------ */
+
+function resetForm() {
+
+    recordForm.reset();
+
+    editId.value = "";
+
+    submitButton.textContent =
+        "Add Record";
+
+    cancelButton.hidden =
+        true;
+}
+
+
+/* ------------------------------
+   Search
+------------------------------ */
+
+searchInput.addEventListener(
+    "input",
+    function() {
+
+        renderRecords();
+    }
+);
+
+
+/* ------------------------------
+   Category Filter
+------------------------------ */
+
+filterCategory.addEventListener(
+    "change",
+    function() {
+
+        renderRecords();
+    }
+);
+
+
+/* ------------------------------
+   Messages
+------------------------------ */
+
+function showMessage(message) {
+
+    formMessage.textContent =
+        message;
+
+
+    setTimeout(
+        function() {
+
+            formMessage.textContent =
+                "";
+
+        },
+        3000
+    );
+}
+
+
+/* ------------------------------
+   Security
+------------------------------ */
+
+/*
+   Prevent user-entered HTML
+   from being interpreted as HTML.
+*/
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* ------------------------------
+   Initial Render
+------------------------------ */
+
+renderRecords();
+```
