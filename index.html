@@ -1,77 +1,176 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Registry</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registry System</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="sheet">
+    <div class="container">
 
-  <header class="masthead">
-    <p class="book-label">Vol. I — kept since 2026</p>
-    <h1 class="title">Student Registry</h1>
-    <p class="subtitle">A roll of everyone enrolled. Add a name below and it joins the record.</p>
-  </header>
+        <!-- Header -->
+        <header>
+            <div>
+                <p class="subtitle">Registry Management</p>
+                <h1>Registered Records</h1>
+            </div>
 
-  <div class="divider"></div>
+            <div class="record-count">
+                <strong id="recordCount">0</strong>
+                <span>Records</span>
+            </div>
+        </header>
 
-  <section class="entry-form">
-    <p class="form-heading">New entry</p>
-    <form id="registry-form" novalidate>
-      <div class="field full">
-        <label for="f-name">Full name <span class="req">*</span></label>
-        <input type="text" id="f-name" name="name" placeholder="e.g. Amara Okafor" autocomplete="off" required>
-      </div>
-      <div class="field">
-        <label for="f-roll">Roll no. / Student ID <span class="req">*</span></label>
-        <input type="text" id="f-roll" name="rollNo" placeholder="e.g. 24-0187" autocomplete="off" required>
-      </div>
-      <div class="field">
-        <label for="f-class">Class / grade</label>
-        <input type="text" id="f-class" name="className" placeholder="e.g. Grade 10-B" autocomplete="off">
-      </div>
-      <div class="field">
-        <label for="f-email">Email</label>
-        <input type="email" id="f-email" name="email" placeholder="e.g. amara@school.edu" autocomplete="off">
-      </div>
-      <div class="field">
-        <label for="f-phone">Phone</label>
-        <input type="tel" id="f-phone" name="phone" placeholder="optional" autocomplete="off">
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="submit" id="submit-btn">Add to registry</button>
-        <span class="form-note" id="form-note"></span>
-      </div>
-    </form>
-  </section>
 
-  <section class="roster">
-    <div class="roster-head">
-      <p class="roster-title">The roll</p>
-      <span class="roster-count" id="roster-count"></span>
+        <!-- Add Record -->
+        <section class="card">
+
+            <h2>Add New Record</h2>
+
+            <form id="recordForm">
+
+                <input type="hidden" id="editId">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            placeholder="Enter name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registryId">Registry ID</label>
+                        <input
+                            type="text"
+                            id="registryId"
+                            placeholder="e.g. REG-001"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            placeholder="name@example.com"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input
+                            type="text"
+                            id="phone"
+                            placeholder="Phone number"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+
+                        <select id="category">
+                            <option value="Student">Student</option>
+                            <option value="Faculty">Faculty</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="form-buttons">
+
+                    <button
+                        type="submit"
+                        class="btn primary"
+                        id="submitButton"
+                    >
+                        Add Record
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn secondary"
+                        id="cancelButton"
+                        hidden
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+                <p id="formMessage"></p>
+
+            </form>
+
+        </section>
+
+
+        <!-- Search -->
+        <section class="card">
+
+            <div class="search-row">
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search by name, ID, email or category..."
+                >
+
+                <select id="filterCategory">
+
+                    <option value="All">
+                        All Categories
+                    </option>
+
+                    <option value="Student">
+                        Student
+                    </option>
+
+                    <option value="Faculty">
+                        Faculty
+                    </option>
+
+                    <option value="Staff">
+                        Staff
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+
+        <!-- Records -->
+        <section class="card">
+
+            <h2>Registry</h2>
+
+            <div id="recordsList"></div>
+
+        </section>
+
     </div>
 
-    <div class="search-field">
-      <input type="text" id="search-input" placeholder="Search by name, ID, or class">
-    </div>
 
-    <div id="roster-container">
-      <p class="loading-state">Opening the register…</p>
-    </div>
-  </section>
+    <script src="script.js"></script>
 
-  <footer class="colophon">
-    <p>Entries are stored in this browser. Clearing your browser data will clear the roll too.</p>
-  </footer>
-
-</div>
-
-<script src="script.js"></script>
 </body>
 </html>
+```
